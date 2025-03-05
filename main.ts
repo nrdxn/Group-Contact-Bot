@@ -118,99 +118,68 @@ class TelegramBot {
             }
         });
 
-        this.bot.action('CreateQuestion', async (ctx: Context) => {
-            const db =
-                (await OrderModel.findOne({ user: ctx.from!.id })) ||
-                new OrderModel({ user: ctx.from!.id });
+        this.bot.action(
+            ['CreateQuestion', 'CreateOrder'],
+            async (ctx: Context) => {
+                const db =
+                    (await OrderModel.findOne({ user: ctx.from!.id })) ||
+                    new OrderModel({ user: ctx.from!.id });
 
-            if (db.blocked) {
-                return await ctx.reply(
-                    '👀 Ошибка: У тебя <b>отобран доступ</b>',
-                    {
-                        parse_mode: 'HTML'
-                    }
+                if (db.blocked) {
+                    return await ctx.reply(
+                        '👀 Ошибка: У тебя <b>отобран доступ</b>',
+                        {
+                            parse_mode: 'HTML'
+                        }
+                    );
+                }
+
+                if (db.isOpenThread) {
+                    return await ctx.reply(
+                        '👀 Ошибка: У тебя есть <b>открытое обращение</b>',
+                        {
+                            parse_mode: 'HTML'
+                        }
+                    );
+                }
+
+                if (db.sendCooldown! > Date.now()) {
+                    return await ctx.reply(
+                        '👀 Ошибка: С прошлого обращения <b>не прошло</b> 10-ти минут.',
+                        {
+                            parse_mode: 'HTML'
+                        }
+                    );
+                }
+
+                await this.bot.telegram
+                    .createForumTopic(
+                        config.chatId,
+                        `${
+                            (ctx.callbackQuery as any).data == 'CreateOrder'
+                                ? 'Заказ'
+                                : 'Вопрос'
+                        } от ${ctx.from?.first_name ?? 'Пользователь'} (${ctx.from!.id})`
+                    )
+                    .then(async (thread) => {
+                        db.threadId = thread.message_thread_id;
+                        db.sendCooldown = Date.now() + ms('10m');
+                        db.isOpenThread = true;
+
+                        await db.save();
+                    });
+
+                await ctx.reply(
+                    `Ожидай, твой 
+                    ${
+                        (ctx.callbackQuery as any).data == 'CreateOrder'
+                            ? 'заказ'
+                            : 'вопрос'
+                    } 
+                    добавлен в очередь.`
                 );
             }
-
-            if (db.isOpenThread) {
-                return await ctx.reply(
-                    '👀 Ошибка: У тебя есть <b>открытое обращение</b>',
-                    {
-                        parse_mode: 'HTML'
-                    }
-                );
-            }
-            if (db.sendCooldown! > Date.now()) {
-                return await ctx.reply(
-                    '👀 Ошибка: С прошлого обращения <b>не прошло</b> 2-ух часов.',
-                    {
-                        parse_mode: 'HTML'
-                    }
-                );
-            }
-
-            await this.bot.telegram
-                .createForumTopic(
-                    config.chatId,
-                    `Вопрос от ${ctx.from?.first_name ?? 'Пользователь'} (${ctx.from!.id})`
-                )
-                .then(async (thread) => {
-                    db.threadId = thread.message_thread_id;
-                    db.sendCooldown = Date.now() + ms('2h');
-                    db.isOpenThread = true;
-
-                    await db.save();
-                });
-
-            await ctx.reply('Ожидай, твой вопрос добавлен в очередь.');
-        });
-
-        this.bot.action('CreateOrder', async (ctx: Context) => {
-            const db =
-                (await OrderModel.findOne({ user: ctx.from!.id })) ||
-                new OrderModel({ user: ctx.from!.id });
-
-            if (db.blocked) {
-                return await ctx.reply(
-                    '👀 Ошибка: У тебя <b>отобран доступ</b>',
-                    {
-                        parse_mode: 'HTML'
-                    }
-                );
-            }
-            
-            if (db.isOpenThread) {
-                return await ctx.reply(
-                    '👀 Ошибка: У тебя есть <b>открытое обращение</b>',
-                    {
-                        parse_mode: 'HTML'
-                    }
-                );
-            }
-            if (db.sendCooldown! > Date.now()) {
-                return await ctx.reply(
-                    '👀 Ошибка: С прошлого обращения <b>не прошло</b> 2-ух часов.',
-                    {
-                        parse_mode: 'HTML'
-                    }
-                );
-            }
-
-            await this.bot.telegram
-                .createForumTopic(
-                    config.chatId,
-                    `Заказ от ${ctx.from?.first_name ?? 'Пользователь'} (${ctx.from!.id})`
-                )
-                .then(async (thread) => {
-                    db.threadId = thread.message_thread_id;
-                    db.sendCooldown = Date.now() + ms('2h');
-                    db.isOpenThread = true;
-
-                    await db.save();
-                });
-
-            await ctx.reply('Ожидай, твой заказ добавлен в очередь.');
-        });
+        );
 
         this.bot.on('message', async (ctx: Context) => {
             if (ctx.message?.is_topic_message) {
