@@ -20,7 +20,7 @@ export class Database {
             .then(() =>
                 this.client.logger.log(
                     LogLevel.INFO,
-                    'Успешное подключение всех сервисов'
+                    'Успешная загрузка всех сервисов'
                 )
             );
     }
