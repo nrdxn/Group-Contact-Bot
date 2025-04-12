@@ -3,9 +3,9 @@ import { Telegraf, Context } from 'telegraf';
 import LoggerService from '@services/Logger';
 
 export class Client {
-    public bot: Telegraf<Context>;
-    public db: Database;
-    public logger: LoggerService;
+    public readonly bot: Telegraf<Context>;
+    public readonly db: Database;
+    public readonly logger: LoggerService;
 
     constructor() {
         this.bot = new Telegraf<Context>(`${process.env['BOT_TOKEN']}`);

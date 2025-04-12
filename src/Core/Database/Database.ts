@@ -4,7 +4,7 @@ import { LogLevel } from '@enums/LogLevel';
 import mongoose from 'mongoose';
 
 export class Database {
-    public users: Users;
+    public readonly users: Users;
 
     constructor(private client: Client) {
         this.users = new Users();

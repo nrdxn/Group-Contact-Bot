@@ -130,7 +130,7 @@ export const start = () => {
                 });
 
             await ctx.reply(
-                `Ожидай, твой ${(ctx.callbackQuery as any).data == 'CreateOrder'? 'заказ': 'вопрос'} добавлен в очередь.`
+                `Ожидай, твой ${(ctx.callbackQuery as any).data == 'CreateOrder' ? 'заказ' : 'вопрос'} добавлен в очередь.`
             );
         }
     );
@@ -149,7 +149,7 @@ export const start = () => {
 
             if (db && db.threadId !== 0) {
                 await ctx.forwardMessage(process.env['CHAT_ID']!, {
-                    message_thread_id: db.threadId
+                    message_thread_id: db.threadId!
                 });
             }
         }
