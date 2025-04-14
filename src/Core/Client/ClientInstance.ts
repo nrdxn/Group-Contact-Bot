@@ -4,9 +4,9 @@ import ms from 'ms';
 
 const client = new Client();
 
-export const start = () => {
+export const start = async () => {
     client.logger.listen();
-    client.db.connect();
+    await client.db.connect();
 
     client.bot.command('start', async (ctx: Context) => {
         await ctx.reply(

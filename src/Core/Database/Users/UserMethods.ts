@@ -1,7 +1,7 @@
 import UserModel from './UserModel';
 
 export class Users {
-    async findUserById(userId: number) {
+    public async findUserById(userId: number) {
         let db = await UserModel.findOne({
             user: userId
         });
@@ -14,11 +14,9 @@ export class Users {
         return db;
     }
 
-    async findUserByThreadId(threadId: number) {
-        let db = await UserModel.findOne({
+    public async findUserByThreadId(threadId: number) {
+        return UserModel.findOne({
             threadId: threadId
         });
-
-        return db;
     }
 }
