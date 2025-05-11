@@ -1,6 +1,6 @@
-import { Client } from './ClientClass';
-import { Context, Markup } from 'telegraf';
 import ms from 'ms';
+import { Context, Markup } from 'telegraf';
+import { Client } from '@core/Client/ClientClass';
 
 const client = new Client();
 

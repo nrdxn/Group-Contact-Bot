@@ -1,4 +1,4 @@
-import UserModel from './UserModel';
+import UserModel from '@core/Database/Users/UserModel';
 
 export class Users {
     public async findUserById(userId: number) {

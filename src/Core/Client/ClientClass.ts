@@ -1,5 +1,5 @@
-import { Database } from '@db/Database';
 import { Telegraf, Context } from 'telegraf';
+import { Database } from '@db/Database';
 import LoggerService from '@services/Logger';
 
 export class Client {

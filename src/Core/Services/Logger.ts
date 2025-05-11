@@ -1,7 +1,7 @@
 import { LogLevel } from '@enums/LogLevel';
 
 export default class LoggerService {
-    listen() {
+    public listen() {
         process
             .on('uncaughtException', (err: Error) => {
                 this.log(LogLevel.ERROR, err);
@@ -13,11 +13,11 @@ export default class LoggerService {
         this.log(LogLevel.INFO, `Логер успешно запущен`);
     }
 
-    log(level: LogLevel, message: any) {
+    public log(level: LogLevel, message: any) {
         console.log(this.formatLog(level, message) + '\n');
     }
 
-    formatLog(level: LogLevel, message: string) {
+    private formatLog(level: LogLevel, message: string) {
         const timestamp =
             new Date().toLocaleDateString() +
             ' | ' +
